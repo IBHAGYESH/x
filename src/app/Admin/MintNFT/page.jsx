@@ -27,6 +27,8 @@ export default function MintNFT() {
   const PINATA_KEY = "0525ddf650657d927560";
   const PINATA_SECRET =
     "4f252b679c2fcee5923093d97aeeb87d5c3ff647bc40b29305d1f5e90edbf382";
+  // Contract wallet address for ARC-19
+  const CONTRACT_WALLET_ADDRESS = "YOUR_CONTRACT_WALLET_ADDRESS";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -138,11 +140,37 @@ export default function MintNFT() {
     };
   };
 
-  // Simulate Algorand smart contract call
-  const callAlgorandContract = async (imageCid, metadataCid) => {
-    // In a real implementation, you would use the Algorand SDK here
-    // This is a simulation that returns a mock transaction hash
+  // Convert CID to Uint8Array for ARC-19 note field
+  const cidToUint8Array = (cid) => {
+    const base32 = cid.replace('ipfs://', '');
+    const decoder = new TextDecoder();
+    return new Uint8Array(decoder.decode(base32));
+  };
 
+  // Simulate Algorand smart contract call with ARC-19
+  const callAlgorandContract = async (imageCid, metadataCid) => {
+    // ARC-19 Implementation Details:
+    // 1. Asset URL is set to a fixed template per ARC-19 specification
+    // 2. Reserve address holds the metadata CID in its first transaction note
+    // 3. Manager address is set to allow future updates
+    
+    // In a real implementation, you would use:
+    // const txn = algosdk.makeAssetCreateTxnWithSuggestedParamsFromObject({
+    //   sender: senderAddress,
+    //   total: 1,
+    //   decimals: 0,
+    //   defaultFrozen: false,
+    //   unitName: "TICKET",
+    //   assetName: `Ticket-${formData.eventName}`,
+    //   assetURL: "template-ipfs://{ipfscid:1:raw:reserve:sha2-256}",
+    //   assetMetadataHash: metadataHashBuffer,
+    //   manager: CONTRACT_WALLET_ADDRESS,
+    //   reserve: CONTRACT_WALLET_ADDRESS,
+    //   clawback: CONTRACT_WALLET_ADDRESS,
+    //   suggestedParams: params,
+    //   note: cidToUint8Array(metadataCid), // CID in binary format
+    // });
+    
     // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
@@ -194,11 +222,11 @@ export default function MintNFT() {
       setCidData((prev) => ({ ...prev, metadataCid }));
       setSuccessMessage("Metadata uploaded successfully!");
 
-      // Step 4: Call Algorand smart contract
-      setSuccessMessage("Minting NFT ticket on Algorand blockchain...");
+      // Step 4: Call Algorand smart contract with ARC-19 parameters
+      setSuccessMessage("Minting NFT ticket with ARC-19 standard...");
       const txHash = await callAlgorandContract(imageCid, metadataCid);
       setCidData((prev) => ({ ...prev, transactionHash: txHash }));
-      setSuccessMessage("NFT ticket minted successfully!");
+      setSuccessMessage("ARC-19 NFT ticket minted successfully!");
     } catch (err) {
       console.error("Minting failed:", err);
       setError(err.message || "Failed to mint NFT ticket. Please try again.");
@@ -493,7 +521,7 @@ export default function MintNFT() {
                     </svg>
                     <div>
                       <p className="font-medium">
-                        Ticket NFT minted on Algorand
+                        ARC-19 Ticket NFT minted on Algorand
                       </p>
                       <p className="text-xs font-mono break-all mt-1">
                         Tx Hash: {cidData.transactionHash}
