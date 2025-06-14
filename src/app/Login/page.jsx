@@ -38,9 +38,9 @@ export default function WalletConnect() {
 
   const navigateBasedOnRole = (walletAddress) => {
     if (walletAddress === ADMIN_WALLET) {
-      router.push("/admin");
+      router.push("/Admin");
     } else {
-      router.push("/user");
+      router.push("/User");
     }
   };
 
